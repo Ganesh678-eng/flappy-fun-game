@@ -17,7 +17,7 @@ body{
   background:yellow;
   border-radius:50%;
   position:absolute;
-  top:150px;
+  top:200px;
   left:60px;
 }
 
@@ -35,6 +35,19 @@ body{
   font-size:24px;
   font-weight:bold;
 }
+
+#startBtn{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  padding:15px 25px;
+  font-size:20px;
+  background:black;
+  color:white;
+  border:none;
+  border-radius:10px;
+}
 </style>
 </head>
 
@@ -42,35 +55,45 @@ body{
 
 <div id="bird"></div>
 <div id="score">Score: 0</div>
+<button id="startBtn">Start Game 🚀</button>
 
 <script>
 
 let bird = document.getElementById("bird");
-let gravity = 0.5;
-let lift = -10;
+let gravity = 0.4;
+let lift = -8;
 let velocity = 0;
 let score = 0;
-
 let pipes = [];
+let gameRunning = false;
 
-// click / tap
+// tap
 document.addEventListener("touchstart", jump);
 document.addEventListener("click", jump);
 
 function jump(){
-  velocity = lift;
+  if(gameRunning){
+    velocity = lift;
+  }
 }
 
-// delay start (IMPORTANT FIX)
-setTimeout(()=>gameLoop(), 1000);
+// start button
+document.getElementById("startBtn").onclick = function(){
+  this.style.display = "none";
+  gameRunning = true;
+  gameLoop();
+};
 
 function gameLoop(){
+
+  if(!gameRunning) return;
 
   velocity += gravity;
   bird.style.top = (bird.offsetTop + velocity) + "px";
 
-  if(Math.random() < 0.02){
-    let gap = 180;
+  // pipe create
+  if(Math.random() < 0.015){
+    let gap = 200;
     let topHeight = Math.random()*150 + 50;
 
     let topPipe = document.createElement("div");
@@ -92,7 +115,7 @@ function gameLoop(){
   }
 
   pipes.forEach((p)=>{
-    let left = p.top.offsetLeft - 2;
+    let left = p.top.offsetLeft - 1.5; // slow speed
     p.top.style.left = left + "px";
     p.bottom.style.left = left + "px";
 
@@ -113,9 +136,9 @@ function gameLoop(){
     ){
       gameOver();
     }
+
   });
 
-  // safer boundary
   if(bird.offsetTop > window.innerHeight - 40 || bird.offsetTop < 0){
     gameOver();
   }
@@ -124,6 +147,7 @@ function gameLoop(){
 }
 
 function gameOver(){
+  gameRunning = false;
   alert("Game Over 😅 Score: " + score);
   location.reload();
 }
