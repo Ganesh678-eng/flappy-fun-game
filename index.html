@@ -17,15 +17,14 @@ body{
   background:yellow;
   border-radius:50%;
   position:absolute;
-  top:200px;
+  top:150px;
   left:60px;
 }
 
 .pipe{
   width:60px;
-  background:linear-gradient(green, darkgreen);
+  background:green;
   position:absolute;
-  border-radius:10px;
 }
 
 #score{
@@ -46,38 +45,33 @@ body{
 
 <script>
 
-// 🔊 sounds
-let tapSound = new Audio("https://www.myinstants.com/en/instant/modi-modi-modi-modi-kids-27626/?utm_source=copy&utm_medium=share");
-let scoreSound = new Audio("https://www.myinstants.com/en/instant/trigger-digga-54138/?utm_source=copy&utm_medium=share");
-let crashSound = new Audio("https://www.myinstants.com/en/instant/laure-na-bhujjam-x-modi-56173/?utm_source=copy&utm_medium=share");
-
 let bird = document.getElementById("bird");
-let gravity = 0.8;
-let lift = -12;
+let gravity = 0.5;
+let lift = -10;
 let velocity = 0;
 let score = 0;
 
 let pipes = [];
 
-// tap / click
+// click / tap
 document.addEventListener("touchstart", jump);
 document.addEventListener("click", jump);
 
 function jump(){
   velocity = lift;
-  tapSound.play();
 }
 
-// game loop
+// delay start (IMPORTANT FIX)
+setTimeout(()=>gameLoop(), 1000);
+
 function gameLoop(){
 
   velocity += gravity;
   bird.style.top = (bird.offsetTop + velocity) + "px";
 
-  // create pipes
   if(Math.random() < 0.02){
-    let gap = 150;
-    let topHeight = Math.random()*200 + 50;
+    let gap = 180;
+    let topHeight = Math.random()*150 + 50;
 
     let topPipe = document.createElement("div");
     topPipe.classList.add("pipe");
@@ -97,21 +91,17 @@ function gameLoop(){
     pipes.push({top:topPipe, bottom:bottomPipe, passed:false});
   }
 
-  // move pipes
   pipes.forEach((p)=>{
     let left = p.top.offsetLeft - 2;
     p.top.style.left = left + "px";
     p.bottom.style.left = left + "px";
 
-    // score
     if(left < 60 && !p.passed){
       score++;
       document.getElementById("score").innerText = "Score: " + score;
-      scoreSound.play();
       p.passed = true;
     }
 
-    // collision
     let b = bird.getBoundingClientRect();
     let t = p.top.getBoundingClientRect();
     let bo = p.bottom.getBoundingClientRect();
@@ -123,27 +113,20 @@ function gameLoop(){
     ){
       gameOver();
     }
-
   });
 
-  // ground / sky
-  if(bird.offsetTop > window.innerHeight || bird.offsetTop < 0){
+  // safer boundary
+  if(bird.offsetTop > window.innerHeight - 40 || bird.offsetTop < 0){
     gameOver();
   }
 
   requestAnimationFrame(gameLoop);
 }
 
-// game over
 function gameOver(){
-  crashSound.play();
-  setTimeout(()=>{
-    alert("Game Over 😂 Score: " + score);
-    location.reload();
-  },200);
+  alert("Game Over 😅 Score: " + score);
+  location.reload();
 }
-
-gameLoop();
 
 </script>
 
